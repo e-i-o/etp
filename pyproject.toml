@@ -1,6 +1,6 @@
 [project]
 name = "etp"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = ["pyyaml", "tabulate"]
 
 [project.scripts]

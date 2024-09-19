@@ -108,6 +108,9 @@ def test_solutions(task_config: TaskConfig, genfile: Genfile, solutions: List[st
 
     time_limiter = TimeLimitProvider(task_config)
     testing_context = TestingContext(checker, time_limiter, task_config)
+    if os.path.isfile(os.path.join("check", "batchmanager")):
+        testing_context.batchmanager_path = os.path.abspath(os.path.join("check", "batchmanager"))
+
     tracker = TestResultTracker()
 
     tests = list(itertools.chain.from_iterable([group.tests for group in genfile.groups]))

@@ -36,7 +36,8 @@ def test_solution(solution: SolutionDescriptor,
                                    solution,
                                    solution.name,
                                    test,
-                                   2 * time_limit_ms)
+                                   2 * time_limit_ms,
+                                   batchmanager_path=context.batchmanager_path)
 
         if exec_result.returncode == -1:
             tracker.register_test_result(solution, test, TestResult(FailedVerdict.TimeLimitExceeded, 

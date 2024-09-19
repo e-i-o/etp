@@ -17,10 +17,10 @@ class RunResult:
     output: bytes
 
 
-# TODO: support for batchmanagers
 def run_solution(task_config: TaskConfig, cwd: str,
                  solution: SolutionDescriptor, executable_path: str,  # relative to cwd
-                 test: Test, timeout_ms: int) -> RunResult:
+                 test: Test, timeout_ms: int,
+                 batchmanager_path=None) -> RunResult:
     if task_config.infile:
         shutil.copyfile(test.input_path, os.path.join(cwd, task_config.infile))
         in_bytes = None
@@ -30,6 +30,8 @@ def run_solution(task_config: TaskConfig, cwd: str,
 
     execute_command = replace_command_tokens(solution.language.execute_command,
                                              solution.path, executable_path)
+    if batchmanager_path is not None:
+        execute_command = [batchmanager_path, task_config.infile, task_config.outfile] + execute_command
 
     usage_start = resource.getrusage(resource.RUSAGE_CHILDREN)
     try:
@@ -47,7 +49,7 @@ def run_solution(task_config: TaskConfig, cwd: str,
     elapsed_time_ms = int(1000 * (usage_end.ru_utime - usage_start.ru_utime))
 
     if task_config.outfile:
-        with open(os.path.join(cwd, task_config.outfile)) as out_stream:
+        with open(os.path.join(cwd, task_config.outfile), "rb") as out_stream:
             out_bytes = out_stream.read()
     else:
         out_bytes = exec_result.stdout

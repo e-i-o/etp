@@ -24,7 +24,7 @@ def get_supported_solution_languages() -> Dict[str, SolutionLanguage]:
         return lang_dict
 
     return {
-        ".py": SolutionLanguage(".py", ["cp", "%s", "%e"], ["pypy3", "%e"], True),
+        ".py": SolutionLanguage(".py", ["cp", "%s", "%e"], ["/bin/pypy3", "%e"], True),
         ".cpp": SolutionLanguage(".cpp", ["g++", "-std=c++17", "-DONLINE_JUDGE", "-O2", "%s", "-o", "%e"], ["./%e"]),
         ".c": SolutionLanguage(".c", ["gcc", "-DONLINE_JUDGE", "-O2", "%s", "-o", "%e"], ["./%e"])
     }

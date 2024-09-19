@@ -42,3 +42,4 @@ class TestingContext:
     checker: CheckerExecutor
     time_limiter: TimeLimitProvider
     task_config: TaskConfig
+    batchmanager_path: str = None
