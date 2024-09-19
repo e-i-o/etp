@@ -9,3 +9,4 @@ class TestResult:
     verdict: Verdict
     time_milliseconds: Optional[int] = None
     exact_match: Optional[bool] = None
+    comment: str = None

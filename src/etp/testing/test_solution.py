@@ -62,4 +62,4 @@ def test_solution(solution: SolutionDescriptor,
             verdict = FailedVerdict.TimeLimitExceeded
 
         print(f"Verdict: {verdict}, elapsed: {exec_result.elapsed_time_ms}, exact match: {exact_match}")
-        tracker.register_test_result(solution, test, TestResult(verdict, exec_result.elapsed_time_ms, exact_match))
+        tracker.register_test_result(solution, test, TestResult(verdict, exec_result.elapsed_time_ms, exact_match, message))
