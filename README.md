@@ -6,7 +6,10 @@ same permissions as your user account. Don't run malicious solutions with these 
 ## Usage:
 
 `etp generate` generates the input tests and the correct outputs.  
-`etp run` runs all solutions on all test cases.
+`etp run` runs all solutions on all test cases.  
+`etp run solution1.cpp solution2.cpp` to run solutions `solution1.cpp` and `solution2.cpp` on all test cases. 
+The parameters `solution1.cpp` are, of course, relative to the current directory. If only one solution is specified,
+the checker comments are also printed
 
 ## Installation
 

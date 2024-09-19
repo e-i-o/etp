@@ -68,16 +68,31 @@ def validate(_):
     raise NotImplementedError()
 
 
-def run(_):
+def run(args):
+    if args.solution:
+        # store the absolute path of every solution
+        args.solution = [os.path.abspath(sol) for sol in args.solution]
+
     move_to_root_dir()
+
+    # and now back to relative paths again...
+    if args.solution:
+        args.solution = [os.path.relpath(sol) for sol in args.solution]
+
     genfile = get_genfile()
     task_config = get_task_config()
 
-    if not task_config.solutions:
+    if not args.solution and not task_config.solutions:
         print(red_bold("No solutions. Nothing to run"))
         return
 
-    test_solutions(task_config, genfile, task_config.solutions)
+    # TODO: correct relativizing of paths
+    if args.solution:
+        solutions = args.solution
+    else:
+        solutions = task_config.solutions
+
+    test_solutions(task_config, genfile, solutions)
 
 
 def main():
@@ -97,6 +112,9 @@ def main():
 
     run_parser = subparsers.add_parser("run",
                                        help="runs the solutions")
+    run_parser.add_argument("solution", nargs="*", help="The path of the solution to run. Any number of "
+                                                        "solutions can be specified. If none are specified, all "
+                                                        "solutions in task.yaml are run.")
     run_parser.set_defaults(func=run)
 
     args = parser.parse_args()
