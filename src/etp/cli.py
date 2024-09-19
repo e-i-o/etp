@@ -39,20 +39,29 @@ def get_task_config() -> TaskConfig:
         return TaskConfig(**yaml.safe_load(f))
 
 
-def generate(_):
+def generate(args):
     move_to_root_dir()
     genfile = get_genfile()
     task_config = get_task_config()
 
-    generate_inputs(genfile)
-    print(green_bold("Input generation complete."))
+    if args.skip_input:
+        print(yellow_bold("Skipping input generation."))
+    else:
+        generate_inputs(genfile)
+        print(green_bold("Input generation complete."))
 
-    ok = validate_all(task_config, genfile)
-    if not ok:
-        return
-    print(green_bold("Validation complete."))
+    if args.skip_validation:
+        print(yellow_bold("Skipping input validation."))
+    else:
+        ok = validate_all(task_config, genfile)
+        if not ok:
+            return
+        print(green_bold("Validation complete."))
 
-    generate_outputs(task_config, genfile)
+    if args.skip_output:
+        print(yellow_bold("Skipping output generation."))
+    else:
+        generate_outputs(task_config, genfile)
 
     gen_n_input = sum([len(group.tests) for group in genfile.groups])
     yaml_n_input = task_config.n_input
@@ -108,6 +117,13 @@ def main():
 
     generate_parser = subparsers.add_parser("generate",
                                             help="generates input and/or output files")
+    generate_parser.add_argument("--skip-input", action="count", default=0, 
+                                 help="If present, then input generation is skipped. Note that the other steps "
+                                      "still expect an input file for each test.")
+    generate_parser.add_argument("--skip-validation", action="count", default=0, 
+                                 help="If present, then input validation is skipped.")
+    generate_parser.add_argument("--skip-output", action="count", default=0,
+                                 help="If present, then output generation is skipped.")
     generate_parser.set_defaults(func=generate)
 
     run_parser = subparsers.add_parser("run",

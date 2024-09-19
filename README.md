@@ -80,7 +80,8 @@ until it finds a directory containing `task.yaml`.
 
 ## Test generation and validation
 
-`etp generate` consists of four phases.
+`etp generate` consists of four phases. The `--skip-input`, `--skip-validation` and `--skip-output` 
+flags can be used to skip the respective phases.
 
 ### Make
 
@@ -178,7 +179,7 @@ read from it. Example value:
     {
         "extension": ".py",
         "compile_command": ["cp", "%s", "%e"],
-        "execute_command": ["pypy3", "%e"],
+        "execute_command": ["/bin/pypy3", "%e"],
         "is_interpreted": true
     },
     {
@@ -190,4 +191,5 @@ read from it. Example value:
 ```
 
 Note that the commands are lists. If you modify the file, also write it in this format. Don't
-use spaces to separate arguments.
+use spaces to separate arguments. Be aware that batchmanagers only work with Python if the 
+interpreter's path is absolute (`pypy3` being in PATH is not sufficient).
