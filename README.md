@@ -3,6 +3,11 @@
 **There is NO sandboxing! All solutions, generators, checkers etc. run with the 
 same permissions as your user account. Don't run malicious solutions with these tools!**
 
+## Usage:
+
+`etp generate` generates the input tests and the correct outputs.  
+`etp run` runs all solutions on all test cases.
+
 ## Installation
 
 1. Install [pipx](https://pipx.pypa.io/latest/installation/)
@@ -30,8 +35,9 @@ as if they were `GroupSum`.
 
 Additionally, the following "custom" values are used.
 
-- `validator`: path to executable file of the validator.
-- `model_solution`: path to the source code of the model solution.
+- `dummy_outputs`: boolean. If set to true, empty output files are generated for all tests.
+- `validator`: string. Path to executable file of the validator.
+- `model_solution`: string. Path to the source code of the model solution.
 - `solutions`: list. Paths to all solutions (wrong or correct).
 
 All paths are relative to the task root directory (the one that contains `task.yaml`).
@@ -131,6 +137,9 @@ output value for all test cases, except for test cases where `%o` is mentioned a
 the `GEN` file (even in comments). The model solution receives a generous time limit of 10 
 seconds for output generation.
 
+If `dummy_outputs` was set in `task.yaml`, instead, all output files that do not yet exist 
+are generated as empty files. Existing output files are not modified (as in `touch`).
+
 ## Running solutions
 
 `etp run` can be used to run all solutions on all test cases and see the results. Before 
@@ -138,7 +147,7 @@ running, each test case must have an input file and an output file (the number o
 is the number of non-comment lines in `GEN`).
 
 If `check/Makefile` exists, then `make all` is run in `check/`. You can put compilation scripts
-for your checker there (if applicable).
+for your checker or batchmanager there (if applicable).
 
 Then, all solutions listed in `task.yaml` are run on all test cases. If `check/checker` exists,
 that program is used to compare outputs. Otherwise, `diff -q --ignore-trailing-space --strip-trailing-cr` 

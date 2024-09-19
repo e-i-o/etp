@@ -16,6 +16,7 @@ class TaskConfig:
     score_type: str = None
 
     # extra etp fields
+    dummy_outputs: bool = False
     validator: str = None
     model_solution: str = None
     solutions: List[str] = None

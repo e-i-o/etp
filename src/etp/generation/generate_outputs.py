@@ -10,18 +10,20 @@ from etp.print_utils import yellow_bold, red_bold
 
 
 def generate_outputs(task_config: TaskConfig, genfile: Genfile):
-    if task_config.model_solution is None:
-        print(yellow_bold("No model solution set, skipping output generation..."))
-        return
-
     Path("input/").mkdir(parents=True, exist_ok=True)
     Path("output/").mkdir(parents=True, exist_ok=True)
     Path(".etp/working").mkdir(parents=True, exist_ok=True)
 
-    # TODO: we may need a flag for dummy output files or similar?
-    # That is, what to do with output-only and interactive files is not clear
-    # (If output files are "hints" or generated alongside input files, that's handled:
-    # this script will not run the model solution on GEN lines that contain %o)
+    if task_config.dummy_outputs:
+        print("Generating dummy outputs as dummy_outputs was set to true in task.yaml")
+        for group in genfile.groups:
+            for test in group.tests:
+                open(test.output_path, "a").close()
+        return
+
+    if not task_config.model_solution:
+        print(yellow_bold("No model solution set, skipping output generation..."))
+        return
 
     descriptor = get_solution_descriptor(task_config.model_solution)
     compile_solution(descriptor, os.path.join(".etp", "working", descriptor.name))
