@@ -11,6 +11,7 @@ from etp.config.make_all import make_all_check
 from etp.config.task_config import TaskConfig
 from etp.etp_exception import UnsupportedLanguageException
 from etp.print_utils import yellow_bold
+from etp.testing.cache.hashing import hash_string, hash_file
 from etp.testing.cms_checker_executor import CmsCheckerExecutor
 from etp.testing.format_result import format_result, format_subtask_result, format_total_result
 from etp.testing.scoretypes.GroupMin import GroupMin
@@ -115,17 +116,32 @@ def create_subtask_table(tests: List[Test], solutions: List[SolutionDescriptor],
     return table
 
 
-def test_solutions(task_config: TaskConfig, genfile: Genfile, solutions: List[str]):
+def test_solutions(task_config: TaskConfig, genfile: Genfile, solutions: List[str], use_cache: bool = False):
+    # context_hash should contain everything "global" that can change how solutions are tested:
+    # this includes:
+    # - infile, outfile, time_limit, time_limit_interpreted
+    # - checker if exists
+    # - batchmanager if exists
+    context_hash = hash_string(f"infile: {task_config.infile}, "
+                               f"outfile: {task_config.outfile}, "
+                               f"time_limit: {task_config.time_limit}, "
+                               f"time_limit_interpreted: {task_config.time_limit_interpreted}")
+
     make_all_check()
     if os.path.isfile(os.path.join("check", "checker")):
         checker = CmsCheckerExecutor(os.path.join("check", "checker"))
+        context_hash = hash_file(os.path.join("check", "checker"), context_hash)
     else:
         checker = DiffChecker()
 
-    time_limiter = TimeLimitProvider(task_config)
-    testing_context = TestingContext(checker, time_limiter, task_config)
+    batchmanager_path = None
     if os.path.isfile(os.path.join("check", "batchmanager")):
-        testing_context.batchmanager_path = os.path.abspath(os.path.join("check", "batchmanager"))
+        batchmanager_path = os.path.abspath(os.path.join("check", "batchmanager"))
+        context_hash = hash_file(os.path.join("check", "batchmanager"), context_hash)
+
+    time_limiter = TimeLimitProvider(task_config)
+    testing_context = TestingContext(checker, time_limiter, task_config, context_hash, 
+                                     use_cache=use_cache, batchmanager_path=batchmanager_path)
 
     tracker = TestResultTracker()
 

@@ -7,6 +7,8 @@ from etp.common.compile import compile_solution
 from etp.common.run import run_solution
 from etp.common.solution_descriptor import SolutionDescriptor
 from etp.common.test import Test
+from etp.testing.cache.cache import get_cached_test_result, cache_test_result
+from etp.testing.cache.hashing import hash_file
 from etp.testing.test_result import TestResult
 from etp.testing.test_result_tracker import TestResultTracker
 from etp.testing.testing_context import TestingContext
@@ -29,7 +31,20 @@ def test_solution(solution: SolutionDescriptor,
         tracker.register_compile_time_fail(solution, TestResult(FailedVerdict.CompilationError))
         return
 
+    solution_hash = hash_file(os.path.join(working_dir, solution.name))
+
     for test in tests:
+        io_hash = hash_file(test.input_path)
+        io_hash = hash_file(test.output_path, io_hash)
+
+        result = get_cached_test_result(solution.path, test.index,
+                                        context.context_hash, solution_hash, io_hash)
+
+        if context.use_cache and result is not None:
+            print(f"Result of {solution.path} on test {test.index} is cached, using cache...")
+            tracker.register_test_result(solution, test, result)
+            continue
+
         time_limit_ms = context.time_limiter.get_time_limit_ms(test, solution)
         exec_result = run_solution(context.task_config, 
                                    working_dir,
@@ -40,12 +55,14 @@ def test_solution(solution: SolutionDescriptor,
                                    batchmanager_path=context.batchmanager_path)
 
         if exec_result.returncode == -1:
-            tracker.register_test_result(solution, test, TestResult(FailedVerdict.TimeLimitExceeded, 
-                                                                    exec_result.elapsed_time_ms, False))
+            result = TestResult(FailedVerdict.TimeLimitExceeded, exec_result.elapsed_time_ms, False)
+            cache_test_result(solution.path, test.index, context.context_hash, solution_hash, io_hash, result)
+            tracker.register_test_result(solution, test, result)
             continue
         elif exec_result.returncode != 0:
-            tracker.register_test_result(solution, test, TestResult(FailedVerdict.RuntimeError, 
-                                                                    exec_result.elapsed_time_ms, False))
+            result = TestResult(FailedVerdict.RuntimeError, exec_result.elapsed_time_ms, False)
+            cache_test_result(solution.path, test.index, context.context_hash, solution_hash, io_hash, result)
+            tracker.register_test_result(solution, test, result)
             continue
 
         output_path = os.path.join(".etp", "output", "out")
@@ -62,4 +79,6 @@ def test_solution(solution: SolutionDescriptor,
             verdict = FailedVerdict.TimeLimitExceeded
 
         print(f"Verdict: {verdict}, elapsed: {exec_result.elapsed_time_ms}, exact match: {exact_match}")
-        tracker.register_test_result(solution, test, TestResult(verdict, exec_result.elapsed_time_ms, exact_match, message))
+        result = TestResult(verdict, exec_result.elapsed_time_ms, exact_match, message)
+        cache_test_result(solution.path, test.index, context.context_hash, solution_hash, io_hash, result)
+        tracker.register_test_result(solution, test, result)

@@ -104,7 +104,7 @@ def run(args):
     else:
         solutions = task_config.solutions
 
-    test_solutions(task_config, genfile, solutions)
+    test_solutions(task_config, genfile, solutions, args.use_cache)
 
 
 def main():
@@ -134,6 +134,9 @@ def main():
     run_parser.add_argument("solution", nargs="*", help="The path of the solution to run. Any number of "
                                                         "solutions can be specified. If none are specified, all "
                                                         "solutions in task.yaml are run.")
+    run_parser.add_argument("-c", "--use-cache", action="count", default=0,
+                            help="If present, then verdicts which 'should not have changed' "
+                                 "are read from a cache.")
     run_parser.set_defaults(func=run)
 
     args = parser.parse_args()

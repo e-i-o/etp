@@ -1,6 +1,6 @@
 import subprocess
 from dataclasses import dataclass
-from typing import Protocol, Tuple
+from typing import Protocol, Tuple, Any
 
 from etp.common.solution_descriptor import SolutionDescriptor
 from etp.common.test import Test
@@ -42,4 +42,6 @@ class TestingContext:
     checker: CheckerExecutor
     time_limiter: TimeLimitProvider
     task_config: TaskConfig
+    context_hash: Any
+    use_cache: bool = False
     batchmanager_path: str = None
