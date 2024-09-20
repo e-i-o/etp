@@ -9,7 +9,7 @@ from etp.config.task_config import TaskConfig
 from etp.print_utils import yellow_bold, red_bold
 
 
-def generate_outputs(task_config: TaskConfig, genfile: Genfile):
+def generate_outputs(task_config: TaskConfig, genfile: Genfile) -> bool:
     Path("input/").mkdir(parents=True, exist_ok=True)
     Path("output/").mkdir(parents=True, exist_ok=True)
     Path(".etp/working").mkdir(parents=True, exist_ok=True)
@@ -19,15 +19,16 @@ def generate_outputs(task_config: TaskConfig, genfile: Genfile):
         for group in genfile.groups:
             for test in group.tests:
                 open(test.output_path, "a").close()
-        return
+        return False
 
     if not task_config.model_solution:
         print(yellow_bold("No model solution set, skipping output generation..."))
-        return
+        return True
 
     descriptor = get_solution_descriptor(task_config.model_solution)
     compile_solution(descriptor, os.path.join(".etp", "working", descriptor.name))
 
+    all_ok = True
     for group in genfile.groups:
         for test in group.tests:
             cmd = test.command_template
@@ -43,7 +44,10 @@ def generate_outputs(task_config: TaskConfig, genfile: Genfile):
                 print(red_bold("FAILED:"), f"model solution got timeout or a runtime error "
                                            f"on test {test.input_path} (return code: {result.returncode}, "
                                            f"elapsed time: {result.elapsed_time_ms})")
+                all_ok = False
                 continue
 
             with open(test.output_path, "wb") as out_file:
                 out_file.write(result.output)
+
+    return all_ok

@@ -55,13 +55,17 @@ def generate(args):
     else:
         ok = validate_all(task_config, genfile)
         if not ok:
+            print(red_bold("FAILED:"), "there were errors during validation. Terminating.")
             return
         print(green_bold("Validation complete."))
 
     if args.skip_output:
         print(yellow_bold("Skipping output generation."))
     else:
-        generate_outputs(task_config, genfile)
+        ok = generate_outputs(task_config, genfile)
+        if not ok:
+            print(red_bold("FAILED:"), "there were errors during output generation. Terminating.")
+            return
 
     gen_n_input = sum([len(group.tests) for group in genfile.groups])
     yaml_n_input = task_config.n_input
@@ -95,7 +99,6 @@ def run(args):
         print(red_bold("No solutions. Nothing to run"))
         return
 
-    # TODO: correct relativizing of paths
     if args.solution:
         solutions = args.solution
     else:
