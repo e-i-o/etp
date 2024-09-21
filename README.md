@@ -85,7 +85,7 @@ flags can be used to skip the respective phases.
 
 ### Make
 
-If the file `gen/Makefile` exists, `make all` is run in `gen/`. You can put compilation
+If the file `gen/Makefile` exists, `make` is run in `gen/`. You can put compilation
 scripts for your generators and validators in there.
 
 ### Input generation
@@ -150,7 +150,7 @@ are generated as empty files. Existing output files are not modified (as in `tou
 running, each test case must have an input file and an output file (the number of test cases
 is the number of non-comment lines in `GEN`).
 
-If `check/Makefile` exists, then `make all` is run in `check/`. You can put compilation scripts
+If `check/Makefile` exists, then `make` is run in `check/`. You can put compilation scripts
 for your checker or batchmanager there (if applicable).
 
 Then, all solutions listed in `task.yaml` are run on all test cases. If `check/checker` exists,

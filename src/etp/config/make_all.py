@@ -10,9 +10,9 @@ def make_all_gen():
         print("Nothing to make.")
         return
 
-    exec_result = subprocess.run(["make", "all"], cwd="gen")
+    exec_result = subprocess.run(["make"], cwd="gen")
     if exec_result.returncode != 0:
-        raise EtpException("'make all' in gen/ failed")
+        raise EtpException("'make' in gen/ failed")
 
 
 def make_all_check():
@@ -20,6 +20,6 @@ def make_all_check():
         print("Nothing to make")
         return
 
-    exec_result = subprocess.run(["make", "all"], cwd="check")
+    exec_result = subprocess.run(["make"], cwd="check")
     if exec_result.returncode != 0:
-        raise EtpException("'make all' in check/ failed")
+        raise EtpException("'make' in check/ failed")
