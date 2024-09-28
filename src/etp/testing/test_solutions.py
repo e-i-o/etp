@@ -15,6 +15,7 @@ from etp.testing.cache.hashing import hash_string, hash_file
 from etp.testing.cms_checker_executor import CmsCheckerExecutor
 from etp.testing.format_result import format_result, format_subtask_result, format_total_result
 from etp.testing.scoretypes.GroupMin import GroupMin
+from etp.testing.scoretypes.GroupMinDeps import GroupMinDeps
 from etp.testing.scoretypes.GroupMul import GroupMul
 from etp.testing.scoretypes.GroupSum import GroupSum
 from etp.testing.scoretypes.GroupSumCheck import GroupSumCheck
@@ -66,6 +67,8 @@ def get_scorer(task_config: TaskConfig, genfile: Genfile) -> ScoreType:
         return GroupSumCond(genfile)
     elif task_config.score_type == "GroupMin":
         return GroupMin(genfile)
+    elif task_config.score_type == "GroupMinDeps":
+        return GroupMinDeps(genfile)
     elif task_config.score_type == "GroupMul":
         return GroupMul(genfile)
     elif task_config.score_type == "Sum":

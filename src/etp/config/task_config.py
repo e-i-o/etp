@@ -22,7 +22,8 @@ class TaskConfig:
     solutions: List[str] = None
 
     def __init__(self, **kwargs):
-        names = set([f.name for f in fields(self)])
-        for k, v in kwargs.items():
-            if k in names:
-                setattr(self, k, v)
+        if kwargs is not None:
+            names = set([f.name for f in fields(self)])
+            for k, v in kwargs.items():
+                if k in names:
+                    setattr(self, k, v)

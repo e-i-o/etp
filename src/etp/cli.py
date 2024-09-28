@@ -1,5 +1,6 @@
 import argparse
 import os.path
+import sys
 
 import yaml
 
@@ -30,6 +31,9 @@ def move_to_root_dir():
 
 
 def get_genfile() -> Genfile:
+    if not os.path.isfile("gen/GEN"):
+        raise EtpException("No gen/GEN file found.")
+
     with open("gen/GEN", "r") as f:
         return parse_genfile(f)
 
@@ -111,12 +115,15 @@ def main():
     parser = argparse.ArgumentParser(prog="etp")
     subparsers = parser.add_subparsers(required=True)
 
+    # TODO: uncomment when validate is implemented
+    """
     validate_parser = subparsers.add_parser("validate", 
                                             help="validates that input files have the correct format")
     validate_parser.set_defaults(func=validate)
     validate_parser.add_argument("file", help="If specified, either the index of the test case "
                                               "or a path to an input file. If not specified, all input files "
                                               "will be validated.")
+    """
 
     generate_parser = subparsers.add_parser("generate",
                                             help="generates input and/or output files")
@@ -139,6 +146,9 @@ def main():
                                  "are read from a cache.")
     run_parser.set_defaults(func=run)
 
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
     args = parser.parse_args()
 
     try:
