@@ -4,6 +4,7 @@ import sys
 
 import yaml
 
+from etp.common.geninfo import print_geninfo
 from etp.config.genfile import Genfile
 from etp.config.parse_genfile import parse_genfile
 from etp.config.task_config import TaskConfig
@@ -40,7 +41,11 @@ def get_genfile() -> Genfile:
 
 def get_task_config() -> TaskConfig:
     with open("task.yaml", "r") as f:
-        return TaskConfig(**yaml.safe_load(f))
+        conf = yaml.safe_load(f)
+        if conf is None:
+            return TaskConfig()
+        else:
+            return TaskConfig(**conf)
 
 
 def generate(args):
@@ -111,6 +116,14 @@ def run(args):
     test_solutions(task_config, genfile, solutions, args.use_cache)
 
 
+def geninfo(_):
+    move_to_root_dir()
+    genfile = get_genfile()
+    task_config = get_task_config()
+
+    print_geninfo(task_config, genfile)
+
+
 def main():
     parser = argparse.ArgumentParser(prog="etp")
     subparsers = parser.add_subparsers(required=True)
@@ -145,6 +158,10 @@ def main():
                             help="If present, then verdicts which 'should not have changed' "
                                  "are read from a cache.")
     run_parser.set_defaults(func=run)
+
+    geninfo_parser = subparsers.add_parser("geninfo",
+                                           help="prints an annotated table of GEN")
+    geninfo_parser.set_defaults(func=geninfo)
 
     if len(sys.argv) == 1:
         parser.print_help()

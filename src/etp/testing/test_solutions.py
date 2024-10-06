@@ -22,7 +22,7 @@ from etp.testing.scoretypes.GroupSumCheck import GroupSumCheck
 from etp.testing.scoretypes.GroupSumCond import GroupSumCond
 from etp.testing.scoretypes.ScoreType import ScoreType
 from etp.testing.scoretypes.adapters import Evaluation, SubmissionResult
-from etp.testing.tabulate_hack import monkey_patch_tabulate
+from etp.common.tabulate_hack import monkey_patch_tabulate
 from etp.testing.test_result import TestResult
 from etp.testing.test_result_tracker import TestResultTracker
 from etp.testing.test_solution import test_solution
