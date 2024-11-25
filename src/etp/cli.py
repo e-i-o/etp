@@ -1,6 +1,7 @@
 import argparse
 import os.path
 import sys
+from email.policy import default
 
 import yaml
 
@@ -9,6 +10,7 @@ from etp.config.genfile import Genfile
 from etp.config.parse_genfile import parse_genfile
 from etp.config.task_config import TaskConfig
 from etp.etp_exception import EtpException
+from etp.generation.delete_extra import delete_extra_files, delete_extra_input_output
 from etp.generation.generate_inputs import generate_inputs
 from etp.generation.generate_outputs import generate_outputs
 from etp.print_utils import red_bold, green_bold, yellow_bold
@@ -71,10 +73,13 @@ def generate(args):
     if args.skip_output:
         print(yellow_bold("Skipping output generation."))
     else:
-        ok = generate_outputs(task_config, genfile)
+        ok = generate_outputs(task_config, genfile, bool(args.no_timeout))
         if not ok:
             print(red_bold("FAILED:"), "there were errors during output generation. Terminating.")
             return
+
+    if not args.no_delete:
+        delete_extra_input_output(genfile)
 
     gen_n_input = sum([len(group.tests) for group in genfile.groups])
     yaml_n_input = task_config.n_input
@@ -147,6 +152,10 @@ def main():
                                  help="If present, then input validation is skipped.")
     generate_parser.add_argument("--skip-output", action="count", default=0,
                                  help="If present, then output generation is skipped.")
+    generate_parser.add_argument("--no-timeout", action="count", default=0,
+                                 help="If present, no timeout is applied on output file generation.")
+    generate_parser.add_argument("--no-delete", action="count", default=0,
+                                 help="If present, extra files in input/ and output/ directories are not deleted")
     generate_parser.set_defaults(func=generate)
 
     run_parser = subparsers.add_parser("run",

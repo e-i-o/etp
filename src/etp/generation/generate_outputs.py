@@ -9,7 +9,7 @@ from etp.config.task_config import TaskConfig
 from etp.print_utils import yellow_bold, red_bold
 
 
-def generate_outputs(task_config: TaskConfig, genfile: Genfile) -> bool:
+def generate_outputs(task_config: TaskConfig, genfile: Genfile, no_timeout: bool) -> bool:
     Path("input/").mkdir(parents=True, exist_ok=True)
     Path("output/").mkdir(parents=True, exist_ok=True)
     Path(".etp/working").mkdir(parents=True, exist_ok=True)
@@ -38,7 +38,7 @@ def generate_outputs(task_config: TaskConfig, genfile: Genfile) -> bool:
 
             print(f"Generating {test.output_path}...")
             result = run_solution(task_config, os.path.join(".etp", "working"), descriptor, 
-                                  descriptor.name, test, 10_000)
+                                  descriptor.name, test, None if no_timeout else 10_000)
 
             if result.returncode != 0:
                 print(red_bold("FAILED:"), f"model solution got timeout or a runtime error "

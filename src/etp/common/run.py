@@ -19,7 +19,7 @@ class RunResult:
 
 def run_solution(task_config: TaskConfig, cwd: str,
                  solution: SolutionDescriptor, executable_path: str,  # relative to cwd
-                 test: Test, timeout_ms: int,
+                 test: Test, timeout_ms: int = None,
                  batchmanager_path=None) -> RunResult:
     if task_config.infile:
         shutil.copyfile(test.input_path, os.path.join(cwd, task_config.infile))
@@ -40,7 +40,7 @@ def run_solution(task_config: TaskConfig, cwd: str,
                                      capture_output=True,
                                      input=in_bytes,
                                      cwd=cwd,
-                                     timeout=timeout_ms / 1000)
+                                     timeout=None if timeout_ms is None else timeout_ms / 1000)
     except subprocess.TimeoutExpired:
         print("Hard timeout exceeded.")
         return RunResult(-1, timeout_ms, b"")

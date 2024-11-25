@@ -144,6 +144,13 @@ seconds for output generation.
 If `dummy_outputs` was set in `task.yaml`, instead, all output files that do not yet exist 
 are generated as empty files. Existing output files are not modified (as in `touch`).
 
+### Deleting extra files in `input/` and `output/`
+
+After test generation, if `input/` or `output/` contain files of the form `input%d.txt` or
+`output%d.txt` with `%d` greater than or equal to the number of test cases listed in 
+`GEN`, these files are moved to `.etp/trash/`. This behavior can be turned off with
+the `--no-delete` flag, in which case no files are deleted or thrashed.
+
 ## Running solutions
 
 `etp run` can be used to run all solutions on all test cases and see the results. Before 

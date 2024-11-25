@@ -11,8 +11,8 @@ from etp.testing.verdict import FailedVerdict
 def get_cached_test_result(solution_path: str, test_index: int,
                            context_hash, solution_hash, io_hash) -> Optional[TestResult]:
     conn, cursor = open_cache_db()
-    cursor.execute("SELECT * FROM runs WHERE test_index = ? AND solution_path = ?",
-                   (test_index, solution_path,))
+    cursor.execute("SELECT * FROM runs WHERE io_hash = ? AND solution_path = ?",
+                   (io_hash.hexdigest(), solution_path,))
     result = cursor.fetchone()
     if result is None:
         conn.close()
@@ -70,8 +70,8 @@ def cache_test_result(solution_path: str, test_index: int,
             verdict_type, verdict_value, time_milliseconds, exact_match, result.comment)
 
     conn, cursor = open_cache_db()
-    cursor.execute("DELETE FROM runs WHERE test_index = ? and solution_path = ?", 
-                   (test_index, solution_path))
+    cursor.execute("DELETE FROM runs WHERE io_hash = ? and solution_path = ?",
+                   (io_hash.hexdigest(), solution_path))
     cursor.execute("INSERT INTO runs VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
     conn.commit()
     conn.close()
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS runs(
 )""")
     cursor.execute("""
 CREATE UNIQUE INDEX IF NOT EXISTS
-ix_index_path ON runs (test_index, solution_path)
+ix_io_path ON runs (io_hash, solution_path)
 """)
 
     return conn, cursor
