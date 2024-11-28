@@ -46,7 +46,7 @@ def run_solution(task_config: TaskConfig, cwd: str,
         return RunResult(-1, timeout_ms, b"")
 
     usage_end = resource.getrusage(resource.RUSAGE_CHILDREN)
-    elapsed_time_ms = int(1000 * (usage_end.ru_utime - usage_start.ru_utime))
+    elapsed_time_ms = int(1000 * (usage_end.ru_utime + usage_end.ru_stime - usage_start.ru_utime - usage_start.ru_stime))
 
     if task_config.outfile:
         with open(os.path.join(cwd, task_config.outfile), "rb") as out_stream:
