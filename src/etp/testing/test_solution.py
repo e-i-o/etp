@@ -55,7 +55,7 @@ def test_solution(solution: SolutionDescriptor,
                                    batchmanager_path=context.batchmanager_path)
 
         if exec_result.returncode == -1:
-            result = TestResult(FailedVerdict.TimeLimitExceeded, exec_result.elapsed_time_ms, False)
+            result = TestResult(FailedVerdict.HardTimeLimitExceeded, exec_result.elapsed_time_ms, False)
             cache_test_result(solution.path, test.index, context.context_hash, solution_hash, io_hash, result)
             tracker.register_test_result(solution, test, result)
             continue
@@ -74,11 +74,14 @@ def test_solution(solution: SolutionDescriptor,
 
         exact_match = ans_bytes == exec_result.output
 
+        original_score = None
         verdict, message = context.checker.execute_checker(test, output_path)
+        if isinstance(verdict, float):
+            original_score = verdict
         if exec_result.elapsed_time_ms > time_limit_ms:
             verdict = FailedVerdict.TimeLimitExceeded
 
         print(f"Verdict: {verdict}, elapsed: {exec_result.elapsed_time_ms}, exact match: {exact_match}")
-        result = TestResult(verdict, exec_result.elapsed_time_ms, exact_match, message)
+        result = TestResult(verdict, exec_result.elapsed_time_ms, exact_match, message, original_score)
         cache_test_result(solution.path, test.index, context.context_hash, solution_hash, io_hash, result)
         tracker.register_test_result(solution, test, result)

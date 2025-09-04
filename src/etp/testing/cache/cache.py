@@ -27,10 +27,14 @@ def get_cached_test_result(solution_path: str, test_index: int,
         conn.close()
         return None  # stale copy in cache
 
+    original_score = None
     if verdict_type == 0:
         verdict = float(verdict_value)
     else:
         verdict = FailedVerdict(verdict_type)
+        if not verdict_value < 0:
+            original_score = float(verdict_value)
+
 
     if time_milliseconds < 0:
         time_milliseconds = None
@@ -43,14 +47,14 @@ def get_cached_test_result(solution_path: str, test_index: int,
         exact_match = None
 
     conn.close()
-    return TestResult(verdict, time_milliseconds, exact_match, comment)
+    return TestResult(verdict, time_milliseconds, exact_match, comment, original_score)
 
 
 def cache_test_result(solution_path: str, test_index: int,
                       context_hash, solution_hash, io_hash, result: TestResult):
     if isinstance(result.verdict, FailedVerdict):
         verdict_type = result.verdict.value
-        verdict_value = 0
+        verdict_value = -1 if result.original_score is None else result.original_score
     else:
         verdict_type = 0
         verdict_value = result.verdict

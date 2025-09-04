@@ -9,7 +9,8 @@ def format_result(result: TestResult) -> str:
         FailedVerdict.TimeLimitExceeded: "TL",
         FailedVerdict.MemoryLimitExceeded: "ML",
         FailedVerdict.JudgementFailed: "FL",
-        FailedVerdict.UnsupportedLanguage: "UL"
+        FailedVerdict.UnsupportedLanguage: "UL",
+        FailedVerdict.HardTimeLimitExceeded: "TL"
     }
 
     ret = ""
@@ -35,6 +36,12 @@ def format_result(result: TestResult) -> str:
     else:
         ret += f"{result.verdict:.3f}"
 
+    if result.verdict == FailedVerdict.TimeLimitExceeded:
+        if result.original_score >= 1:
+            ret += "?"
+        else:
+            ret += "#"
+
     # exact match
     if result.exact_match:
         ret += "!"
@@ -44,6 +51,8 @@ def format_result(result: TestResult) -> str:
 
     # turn color off
     ret += "\x1B[0m"
+    if result.verdict == FailedVerdict.HardTimeLimitExceeded:
+        ret += ">"
     ret += f"{result.time_milliseconds} ms"
     return ret
 
