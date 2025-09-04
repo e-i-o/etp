@@ -81,7 +81,7 @@ def generate(args):
     if not args.no_delete:
         delete_extra_input_output(genfile)
 
-    gen_n_input = sum([len(group.tests) for group in genfile.groups])
+    gen_n_input = len(genfile.tests)
     yaml_n_input = task_config.n_input
     if yaml_n_input is None:
         print(yellow_bold("WARN:"), f"n_input is not set in task.yaml, should be {gen_n_input}")

@@ -11,7 +11,7 @@ def delete_extra_input_output(genfile: Genfile):
     Path("output/").mkdir(parents=True, exist_ok=True)
     Path(".etp/trash/").mkdir(parents=True, exist_ok=True)
 
-    n_input = sum(len(group.tests) for group in genfile.groups)
+    n_input = len(genfile.tests)
     delete_extra_files("input", "input", ".txt", n_input)
     delete_extra_files("output", "output", ".txt", n_input)
 

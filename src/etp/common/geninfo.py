@@ -6,6 +6,10 @@ from etp.config.genfile import Genfile
 from etp.config.task_config import TaskConfig
 
 
+def grey(s: str):
+    return f"\x1B[0;90m{s}\x1B[0m"
+
+
 def print_geninfo(task_config: TaskConfig, genfile: Genfile):
     table : List[List[str]] = []
     header = ["#", "CMS #", "Expanded command"]
@@ -25,7 +29,11 @@ def print_geninfo(task_config: TaskConfig, genfile: Genfile):
             cmd = test.command_template
             cmd = cmd.replace("%i", test.input_path)
             cmd = cmd.replace("%o", test.output_path)
-            table.append([str(test.index), str(in_group_index), cmd])
+
+            row = [str(test.index), str(in_group_index), cmd]
+            if test.index in group.shadow_tests:
+                row = list(map(grey, row))
+            table.append(row)
 
     print(tabulate(table, headers="firstrow", tablefmt="fancy_grid"))
     print(f"Total points: {total_points}")

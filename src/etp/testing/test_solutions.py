@@ -15,7 +15,6 @@ from etp.testing.cache.hashing import hash_string, hash_file
 from etp.testing.cms_checker_executor import CmsCheckerExecutor
 from etp.testing.format_result import format_result, format_subtask_result, format_total_result
 from etp.testing.scoretypes.GroupMin import GroupMin
-from etp.testing.scoretypes.GroupMinDeps import GroupMinDeps
 from etp.testing.scoretypes.GroupMul import GroupMul
 from etp.testing.scoretypes.GroupSum import GroupSum
 from etp.testing.scoretypes.GroupSumCheck import GroupSumCheck
@@ -65,10 +64,8 @@ def get_scorer(task_config: TaskConfig, genfile: Genfile) -> ScoreType:
         return GroupSumCheck(genfile)
     elif task_config.score_type == "GroupSumCond":
         return GroupSumCond(genfile)
-    elif task_config.score_type == "GroupMin":
+    elif task_config.score_type == "GroupMin" or task_config.score_type == "GroupMinDeps":
         return GroupMin(genfile)
-    elif task_config.score_type == "GroupMinDeps":
-        return GroupMinDeps(genfile)
     elif task_config.score_type == "GroupMul":
         return GroupMul(genfile)
     elif task_config.score_type == "Sum":
@@ -148,7 +145,6 @@ def test_solutions(task_config: TaskConfig, genfile: Genfile, solutions: List[st
 
     tracker = TestResultTracker()
 
-    tests = list(itertools.chain.from_iterable([group.tests for group in genfile.groups]))
     descriptors = []
     for solution in solutions:
         try:
@@ -161,12 +157,12 @@ def test_solutions(task_config: TaskConfig, genfile: Genfile, solutions: List[st
             tracker.register_compile_time_fail(descriptor, TestResult(FailedVerdict.UnsupportedLanguage))
             continue
 
-        test_solution(descriptor, testing_context, tests, tracker)
+        test_solution(descriptor, testing_context, genfile.tests, tracker)
 
     result_table = create_table(genfile, descriptors, tracker)
 
     scorer = get_scorer(task_config, genfile)
-    subtask_table = create_subtask_table(tests, descriptors, scorer, tracker, genfile)
+    subtask_table = create_subtask_table(genfile.tests, descriptors, scorer, tracker, genfile)
 
     monkey_patch_tabulate()
     print(tabulate(result_table, headers="firstrow", tablefmt="fancy_grid"))

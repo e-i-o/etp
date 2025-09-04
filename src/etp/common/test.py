@@ -8,3 +8,4 @@ class Test:
     input_path: str
     output_path: str
     command_template: Optional[str] = None
+    original_group_name: Optional[str] = None

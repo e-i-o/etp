@@ -13,18 +13,17 @@ def generate_inputs(genfile: Genfile):
     Path("output/").mkdir(parents=True, exist_ok=True)
 
     print("Generating inputs...")
-    for group in genfile.groups:
-        for test in group.tests:
-            cmd = test.command_template
-            cmd = cmd.replace("%i", test.input_path)
-            cmd = cmd.replace("%o", test.output_path)
+    for test in genfile.tests:
+        cmd = test.command_template
+        cmd = cmd.replace("%i", test.input_path)
+        cmd = cmd.replace("%o", test.output_path)
 
-            if test.command_template.isdigit():
-                print(f"Command template for {test.input_path} is just a digit, skipping...")
-                continue
+        if test.command_template.isdigit():
+            print(f"Command template for {test.input_path} is just a digit, skipping...")
+            continue
 
-            print(cmd)
-            try:
-                subprocess.run([cmd], shell=True, check=True)
-            except subprocess.CalledProcessError:
-                raise EtpException("generator raised error, terminating...")
+        print(cmd)
+        try:
+            subprocess.run([cmd], shell=True, check=True)
+        except subprocess.CalledProcessError:
+            raise EtpException("generator raised error, terminating...")

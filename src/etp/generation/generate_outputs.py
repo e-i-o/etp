@@ -16,9 +16,8 @@ def generate_outputs(task_config: TaskConfig, genfile: Genfile, no_timeout: bool
 
     if task_config.dummy_outputs:
         print("Generating dummy outputs as dummy_outputs was set to true in task.yaml")
-        for group in genfile.groups:
-            for test in group.tests:
-                open(test.output_path, "a").close()
+        for test in genfile.tests:
+            open(test.output_path, "a").close()
         return False
 
     if not task_config.model_solution:
@@ -29,25 +28,24 @@ def generate_outputs(task_config: TaskConfig, genfile: Genfile, no_timeout: bool
     compile_solution(descriptor, os.path.join(".etp", "working", descriptor.name))
 
     all_ok = True
-    for group in genfile.groups:
-        for test in group.tests:
-            cmd = test.command_template
-            if "%o" in cmd:
-                print(f"Skipping generation of {test.output_path} as there is an '%o' token in the script line")
-                continue
+    for test in genfile.tests:
+        cmd = test.command_template
+        if "%o" in cmd:
+            print(f"Skipping generation of {test.output_path} as there is an '%o' token in the script line")
+            continue
 
-            print(f"Generating {test.output_path}...")
-            result = run_solution(task_config, os.path.join(".etp", "working"), descriptor, 
-                                  descriptor.name, test, None if no_timeout else 10_000)
+        print(f"Generating {test.output_path}...")
+        result = run_solution(task_config, os.path.join(".etp", "working"), descriptor,
+                              descriptor.name, test, None if no_timeout else 10_000)
 
-            if result.returncode != 0:
-                print(red_bold("FAILED:"), f"model solution got timeout or a runtime error "
-                                           f"on test {test.input_path} (return code: {result.returncode}, "
-                                           f"elapsed time: {result.elapsed_time_ms})")
-                all_ok = False
-                continue
+        if result.returncode != 0:
+            print(red_bold("FAILED:"), f"model solution got timeout or a runtime error "
+                                       f"on test {test.input_path} (return code: {result.returncode}, "
+                                       f"elapsed time: {result.elapsed_time_ms})")
+            all_ok = False
+            continue
 
-            with open(test.output_path, "wb") as out_file:
-                out_file.write(result.output)
+        with open(test.output_path, "wb") as out_file:
+            out_file.write(result.output)
 
     return all_ok

@@ -18,8 +18,8 @@ class ScoreType(metaclass=ABCMeta):
         """
         self.parameters = []
         for group in genfile.groups:
-            self.parameters.append([group.points, len(group.tests)] + group.parameters)
-        self.n_input = sum([len(group.tests) for group in genfile.groups])
+            self.parameters.append([group.points, group.tests] + group.parameters)
+        self.n_input = len(genfile.tests)
 
         # Preload the maximum possible scores.
         try:
@@ -97,24 +97,10 @@ class ScoreTypeGroup(ScoreTypeAlone):
 
         """
 
-        t_params = [p[1] for p in self.parameters]
-
-        if all(isinstance(t, int) for t in t_params):
-
-            indices = list(range(self.n_input))
-            current = 0
-            targets = []
-
-            for t in t_params:
-                next_ = current + t
-                targets.append(indices[current:next_])
-                current = next_
-
-            return targets
-
-        raise ValueError(
-            "In the score type parameters, the second value of each element "
-            "must have the same type (int or unicode)")
+        targets = []
+        for t in self.parameters:
+            targets.append(list(map(lambda test: test.index, t[1])))
+        return targets
 
     def max_scores(self) -> float:
         """See ScoreType.max_score."""
