@@ -19,9 +19,9 @@ class DiffChecker(CheckerExecutor):
         exec_result = subprocess.run(["diff", "-q", "--ignore-trailing-space", "--strip-trailing-cr",
                                       test.output_path, output_path])
         if exec_result.returncode == 0:
-            return 1, "exact match up to trailing whitespace"
+            return 1.0, "exact match up to trailing whitespace"
         else:
-            return 0, "wrong answer"
+            return 0.0, "wrong answer"
 
 
 class TimeLimitProvider:
