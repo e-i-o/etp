@@ -59,12 +59,13 @@ def format_result(result: TestResult) -> str:
 
 def format_subtask_result(subtask) -> str:
     max_score = subtask["max_score"]
-    score = subtask["score_fraction"] * max_score
+    frac = subtask["score_fraction"]
+    score = frac * max_score
 
     ret = ""
-    if score >= max_score:
+    if frac >= 1:
         ret += "\x1B[0;32m"  # normal green
-    elif score <= 0:
+    elif frac <= 0:
         ret += "\x1B[0;31m"  # normal red
     else:
         ret += "\x1B[0;33m"  # normal yellow
