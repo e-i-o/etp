@@ -14,6 +14,7 @@ from etp.generation.delete_extra import delete_extra_files, delete_extra_input_o
 from etp.generation.generate_inputs import generate_inputs
 from etp.generation.generate_outputs import generate_outputs
 from etp.print_utils import red_bold, green_bold, yellow_bold
+from etp.skeleton.skeleton import generate_skeleton
 from etp.testing.test_solutions import test_solutions
 from etp.validation.run_validator import validate_all
 
@@ -129,6 +130,10 @@ def geninfo(_):
     print_geninfo(task_config, genfile)
 
 
+def init(_):
+    generate_skeleton()
+
+
 def main():
     parser = argparse.ArgumentParser(prog="etp")
     subparsers = parser.add_subparsers(required=True)
@@ -171,6 +176,10 @@ def main():
     geninfo_parser = subparsers.add_parser("geninfo",
                                            help="prints an annotated table of GEN")
     geninfo_parser.set_defaults(func=geninfo)
+
+    init_parser = subparsers.add_parser("init",
+                                        help="generates default task.yaml and some other samples")
+    init_parser.set_defaults(func=init)
 
     if len(sys.argv) == 1:
         parser.print_help()
